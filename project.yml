@@ -1,0 +1,6 @@
+name: A loadbalanced drupal stack
+downloadpath: libs
+modulepath: libs
+repo:
+  - https://github.com/inmanta/
+  - git@github.com:inmanta/

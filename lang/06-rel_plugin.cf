@@ -1,0 +1,30 @@
+entity Network:
+    string network_name
+    number segmentation_id
+    string segmentation_type
+end
+
+implement Network using std::none
+
+entity Subnet:
+    string subnet_name
+    string network_address
+end
+
+implement Subnet using std::none
+
+Subnet.network [1] -- Network.subnets [0:]
+
+net1 = Network(network_name="net1", segmentation_id=10, segmentation_type="vlan")
+sub1 = Subnet(subnet_name="sub1", network_address="192.0.2.0/24", network=net1)
+sub2 = Subnet(subnet_name="sub2", network_address="198.51.100.0/24", network=net1)
+
+import ip
+gw_last_octect = 1
+
+for s in net1.subnets:
+    std::print("Subnet {{s.subnet_name}} has address {{s.network_address}} on network {{ s.network.network_name }}")
+    sub_gw = ip::ipindex(s.network_address, gw_last_octect)
+
+    std::print("Gatway for {{s.subnet_name}} is {{ sub_gw }}")
+end

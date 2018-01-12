@@ -1,0 +1,74 @@
+import ip
+gw_last_octet = 1
+
+
+typedef segm_t as string matching self == "vxlan" or self == "vlan" or self == "none"
+typedef segm_id as number matching self > 0 and self < 4096
+typedef cidr as string matching /^([0-9]{1,3})(\.[0-9]{1,3}){3}.[0-9]{1,2}$/
+typedef v6_net as string matching /^(?:[a-f0-9]{1,4}:){1,4}[a-f0-9]{1,4}$/
+
+entity Network:
+    string network_name
+    segm_id segmentation_id
+    segm_t segmentation_type
+end
+
+implement Network using std::none
+
+entity Subnet:
+    string subnet_name
+    string gateway_address
+end
+
+entity V4Subnet extends Subnet:
+    cidr network_address
+end
+
+implementation v4GW for V4Subnet:
+    self.gateway_address = ip::ipindex(self.network_address, gw_last_octet)
+end
+
+entity V6Subnet extends Subnet:
+    v6_net network_address
+end
+
+implementation v6GW for V6Subnet:
+    self.gateway_address = "{{ network_address }}::{{gw_last_octet}}"
+end
+
+implement V4Subnet using v4GW
+implement V6Subnet using v6GW
+
+Subnet.network [1] -- Network.subnets [0:]
+
+entity Router:
+    string router_name
+end
+
+implementation cumulus for Router:
+    std::print(std::template("/cumulus.j2"))
+end
+
+implement Router using cumulus
+
+entity Interface:
+    string name
+end
+
+implement Interface using std::none
+
+Interface.networks [0:] -- Network
+Router.interfaces [0:] -- Interface.gateway [0:1]
+
+net1 = Network(network_name="net1", segmentation_id=10, segmentation_type="vlan")
+sub1 = V4Subnet(subnet_name="sub1", network_address="192.0.2.0/24", network=net1)
+sub2 = V4Subnet(subnet_name="sub2", network_address="198.51.100.0/24", network=net1)
+sub3 = V6Subnet(subnet_name="x", network_address="2a02:1810:bc04:5200", network=net1)
+
+for s in net1.subnets:
+    std::print("Subnet {{s.subnet_name}} has address {{s.network_address}} on network {{ s.network.network_name }}")
+    std::print("Gatway for {{s.subnet_name}} is {{ s.gateway_address }}")
+end
+
+r1 = Router(router_name="router1")
+r1.interfaces = Interface(name="swp1", networks=[net1])

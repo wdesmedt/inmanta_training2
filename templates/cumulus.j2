@@ -1,0 +1,39 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*.intf
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto br0
+iface br0
+    bridge-vlan-aware yes
+    bridge-ports {{ interfaces | join(" ", attribute="name") }}
+    bridge-stp on 
+    bridge-vids {% for iface in interfaces %}{% for net in iface.networks %}{% if net.segmentation_type == "vlan" %}{{ net.segmentation_id }} {% endif %}{% endfor %}{% endfor %}
+    bridge-pvid 1
+    mstpctl-treeprio 4096
+
+{% for interface in interfaces -%}
+auto {{ interface.name }}
+iface {{ interface.name }}
+    mstpctl-portadminedge yes
+    mstpctl-bpduguard yes
+    bridge-vids {% for net in interface.networks %}{% if net.segmentation_type == "vlan" %}{{ net.segmentation_id }} {% endif %}{% endfor %}
+{%- endfor %}
+
+{% for iface in interfaces -%}
+{% for net in iface.networks -%}
+{% if net.segmentation_type == "vlan" %}
+auto {{ net.segmentation_id }}
+iface {{ net.segmentation_id }}
+    vlan-id 100
+    vlan-raw-device bridge
+    {% for subnet in net.subnets -%}
+    address {{ subnet.gateway_address }}
+    {% endfor %}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}

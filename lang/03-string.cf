@@ -1,0 +1,4 @@
+hostname = "inmanta.com"
+document_root = "/var/www/domains/{{ hostname }}/content"
+
+std::print(document_root)

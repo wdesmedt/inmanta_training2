@@ -1,0 +1,9 @@
+entity Network:
+    string network_name
+    number segmentation_id
+    string segmentation_type
+end
+
+implement Network using std::none
+
+net1 = Network(network_name="net1", segmentation_id=10, segmentation_type="vlan")
