@@ -12,6 +12,7 @@ entity Network:
     string network_name
     segm_id segmentation_id
     segm_t segmentation_type
+    string[] tags=[]
 end
 
 implement Network using std::none
@@ -78,7 +79,7 @@ implement Interface using std::none
 Interface.networks [0:] -- Network
 Router.interfaces [0:] -- Interface.gateway [0:1]
 
-net1 = Network(network_name="net1", segmentation_id=10, segmentation_type="vlan")
+net1 = Network(network_name="net1", segmentation_id=10, segmentation_type="vlan", tags=["vlan"])
 sub1 = V4Subnet(subnet_name="sub1", network_address="192.0.2.0/24", network=net1)
 sub2 = V4Subnet(subnet_name="sub2", network_address="198.51.100.0/24", network=net1)
 sub3 = V6Subnet(subnet_name="x", network_address="2a02:1810:bc04:5200", network=net1)
