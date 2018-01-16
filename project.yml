@@ -1,6 +1,6 @@
-name: A loadbalanced drupal stack
+name: A project with basic language examples
 downloadpath: libs
 modulepath: libs
 repo:
+  - https://training:Oosai1mahv@modules.inmanta.com/git/nfv/
   - https://github.com/inmanta/
-  - git@github.com:inmanta/
