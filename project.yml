@@ -2,5 +2,5 @@ name: A project with basic language examples
 downloadpath: libs
 modulepath: libs
 repo:
-  - https://training:Oosai1mahv@modules.inmanta.com/git/nfv/
+  - https://trainingr:JS9yx94JR51oJzyshNu9@code.inmanta.com/training/{}.git
   - https://github.com/inmanta/

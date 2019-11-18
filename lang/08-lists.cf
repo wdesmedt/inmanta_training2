@@ -1,4 +1,4 @@
-typedef segm_t as string matching self == "vxlan" or self == "vlan" or self == "none"
+typedef segm_t as string matching self == "vlan" or self == "none"
 typedef segm_id as number matching self > 0 and self < 4096
 typedef cidr as string matching /^([0-9]{1,3})(\.[0-9]{1,3}){3}.[0-9]{1,2}$/
 
